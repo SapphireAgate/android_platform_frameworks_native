@@ -43,6 +43,11 @@
 #define INT32_MAX ((int32_t)(2147483647))
 #endif
 
+
+static int agate_merge_policies(int t1, int t2) {
+	return 0;
+}
+
 #define LOG_REFS(...)
 //#define LOG_REFS(...) ALOG(LOG_DEBUG, "Parcel", __VA_ARGS__)
 
@@ -1877,7 +1882,7 @@ void Parcel::updateTaint(const uint32_t tag, const uint32_t start, const uint32_
     }
 }
 #else
-    mTaintTag |= tag;
+    mTaintTag = tag;
     //if (tag != 0) {
         //LOGW("Parcel::UpdateTaint(0x%08x) -- Parcel Taint = 0x%08x --\n", tag, mTaintTag);
     //}    
@@ -1891,14 +1896,14 @@ uint32_t Parcel::getTaint(const uint32_t start, const uint32_t len)
 #ifdef WITH_TAINT_BYTE_PARCEL
     uint32_t tag = 0;
     uint32_t end = start + len;
-    if(end < start) return 0; /* overflow */
+    if(end < start) return 0; /* overflow */ //TODO: this is a taint leak making agate insecure
     while(mpTaintInfo->mCurPos < mpTaintInfo->mTaintSize)
     {
         const taint_in_parcel * tp = &mpTaintInfo->parcelArray[mpTaintInfo->mCurPos];
         if(tp->pos >= end) break;
         uint32_t tpend = tp->pos + tp->len;
-        if(tpend > start) tag |= tp->taint;
-        if(tpend > end) break;
+        if(tpend > start) tag = agate_merge_policies(tag, tp->taint);
+        //TODO: removed in agate because appeared to be bug, was if(tpend > end) break;
         mpTaintInfo->mCurPos ++;
     }
     if(mpTaintInfo->mTaintSize > 0)
