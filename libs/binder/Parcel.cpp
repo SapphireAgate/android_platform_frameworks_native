@@ -495,7 +495,7 @@ status_t Parcel::appendFrom(const Parcel *parcel, size_t offset, size_t len)
     //updateTaint(parcel->getTaint());
 #else
     /* propagate the taint tag */
-    updateTaint(parcel->mTaintTag, offset, len);
+    //updateTaint(parcel->mTaintTag, offset, len);
 #endif /*WITH_TAINT_BYTE_PARCEL*/
 #endif
 
@@ -1823,7 +1823,7 @@ void Parcel::scanForFds() const
 
 #ifdef WITH_TAINT_TRACKING
 void Parcel::updateTaint(const uint32_t tag, const uint32_t start, const uint32_t len)
-{
+{	
 #ifdef WITH_TAINT_BYTE_PARCEL
     if(tag != 0)
     {
