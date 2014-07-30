@@ -1903,7 +1903,7 @@ uint32_t Parcel::getTaint(const uint32_t start, const uint32_t len)
         if(tp->pos >= end) break;
         uint32_t tpend = tp->pos + tp->len;
         if(tpend > start) tag = agate_merge_policies(tag, tp->taint);
-        //TODO: removed in agate because appeared to be bug, was if(tpend > end) break;
+        if(tpend > end) break; //TODO: removed in agate because appeared to be bug, was if(tpend > end) break;
         mpTaintInfo->mCurPos ++;
     }
     if(mpTaintInfo->mTaintSize > 0)
